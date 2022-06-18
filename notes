@@ -2,6 +2,8 @@
 # CENTOS
 #####
 
-To configure static IP: nmtui
+nmtui
+journalctl -xe
+netstat -antp
 
 

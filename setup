@@ -8,14 +8,15 @@ init(){
 }
 
 create-users(){
-  groupadd development && groupadd operations
-  useradd -e 2022-12-12 -s /bin/bash -m -G development user1 && \
-  useradd -e 2022-12-12 -s /bin/bash -m -G development user2 && \
+  groupadd development
+  groupadd operations
+  useradd -e 2022-12-12 -s /bin/bash -m -G development user1 
+  useradd -e 2022-12-12 -s /bin/bash -m -G development user2 
   useradd -e 2022-12-12 -s /bin/bash -m -G development user3
   echo "user1:pass" | chpasswd
   echo "user2:pass" | chpasswd
   echo "user3:pass" | chpasswd
-  mkdir /Development
+  mkdir /DevelopmentFiles
   mkdir /Links
   chgrp -R development /DevelopmentFiles
 }
@@ -24,10 +25,11 @@ create-links(){
   mkdir ~/repos
   git clone https://github.com/rafaelpardor/centos-server \
     repos/centos-server
-  ln -sf ~/repos/centos-server/dhcp.conf /etc/dhcp/dhcp.conf
-  ln -sf ~/repos/centos-server/dhcp /etc/sysconfig/dhcpd
+  ln -sf ~/repos/centos-server/dhcpd.conf /etc/dhcp/dhcpd.conf 
+  ln -sf ~/repos/centos-server/dhcp /etc/sysconfig/dhcpd # Cambiar tarjeta de red
   ln -sf ~/repos/centos-server/smb.conf /etc/samba/smb.con
-  ln -sf ~/repos/centos-server/named.conf /etc/samba/smb.con
+  ln -sf ~/repos/centos-server/named.conf /etc/named.conf
+  ln -sf ~/repos/centos-server/named.localhost /var/named/named.localhost
 }
 
 samba(){

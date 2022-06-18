@@ -1,0 +1,59 @@
+#!/bin/bash
+
+init(){
+  yum update -y && yum upgrade -y && \
+  yum install git vim tmux dhcp \
+    bind bind-utils \
+    samba samba-common samba-client -y
+}
+
+create-users(){
+  groupadd development && groupadd operations
+  useradd -e 2022-12-12 -s /bin/bash -m -G development user1 && \
+  useradd -e 2022-12-12 -s /bin/bash -m -G development user2 && \
+  useradd -e 2022-12-12 -s /bin/bash -m -G development user3
+  echo "user1:pass" | chpasswd
+  echo "user2:pass" | chpasswd
+  echo "user3:pass" | chpasswd
+  mkdir /Development
+  mkdir /Links
+  chgrp -R development /DevelopmentFiles
+}
+
+create-links(){
+  mkdir ~/repos
+  git clone https://github.com/rafaelpardor/centos-server \
+    repos/centos-server
+  ln -sf ~/repos/centos-server/dhcp.conf /etc/dhcp/dhcp.conf
+  ln -sf ~/repos/centos-server/dhcp /etc/sysconfig/dhcpd
+  ln -sf ~/repos/centos-server/smb.conf /etc/samba/smb.con
+  ln -sf ~/repos/centos-server/named.conf /etc/samba/smb.con
+}
+
+samba(){
+  mkdir -p /samba/anonymous
+  systemctl enable smb.service
+  systemctl enable nmb.service
+  systemctl restart smb.service
+  systemctl restart nmb.service
+  firewall-cmd --permanent --zone=public --add-service=samba
+  firewall-cmd --reload
+
+  chmod -R 0755 /samba/anonymous/
+  chown -R nobody:nobody anonymous/
+  chcon -t samba_share_t anonymous/
+
+  groupadd smbgrp
+  useradd user -G smbgrp
+  smbpasswd -a user
+
+  mkdir -p /samba/secured
+  chmod -R 0777 secured/
+  chcon -t samba_share_t /samba/secured/
+
+  systemctl restart smb.service
+  chown -R srijan:smbgrp /samba/secured/
+}
+
+
+

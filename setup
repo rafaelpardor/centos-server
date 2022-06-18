@@ -4,21 +4,35 @@ init(){
   yum update -y && yum upgrade -y && \
   yum install git vim tmux dhcp \
     bind bind-utils \
-    samba samba-common samba-client -y
+    samba samba-common samba-client \
+    acl -y
 }
 
 create-users(){
   groupadd development
   groupadd operations
   useradd -e 2022-12-12 -s /bin/bash -m -G development user1 
-  useradd -e 2022-12-12 -s /bin/bash -m -G development user2 
-  useradd -e 2022-12-12 -s /bin/bash -m -G development user3
   echo "user1:pass" | chpasswd
+  useradd -e 2022-12-12 -s /bin/bash -m -G development user2 
   echo "user2:pass" | chpasswd
+  useradd -e 2022-12-12 -s /bin/bash -m -G development user3
   echo "user3:pass" | chpasswd
   mkdir /DevelopmentFiles
   mkdir /Links
   chgrp -R development /DevelopmentFiles
+}
+
+create-files(){
+  cp ~/repos/centos-server/script /DevelopmentFiles/script1
+  cp ~/repos/centos-server/script /DevelopmentFiles/script2
+  cp ~/repos/centos-server/script /DevelopmentFiles/script3
+  cp ~/repos/centos-server/script /DevelopmentFiles/script4
+  cp ~/repos/centos-server/script /DevelopmentFiles/script5
+  cp ~/repos/centos-server/script /DevelopmentFiles/script6
+  cp ~/repos/centos-server/script /DevelopmentFiles/script7
+  cp ~/repos/centos-server/script /DevelopmentFiles/script8
+  cp ~/repos/centos-server/script /DevelopmentFiles/script8
+  cp ~/repos/centos-server/script /DevelopmentFiles/script10
 }
 
 create-links(){
@@ -30,6 +44,8 @@ create-links(){
   ln -sf ~/repos/centos-server/smb.conf /etc/samba/smb.con
   ln -sf ~/repos/centos-server/named.conf /etc/named.conf
   ln -sf ~/repos/centos-server/named.localhost /var/named/named.localhost
+  ln -sf /DevelopmentFiles/script2 /Links/script2
+  ln -sf /DevelopmentFiles/script10 /Links/script10
 }
 
 samba(){
@@ -57,5 +73,34 @@ samba(){
   chown -R srijan:smbgrp /samba/secured/
 }
 
+acl() {
+  groupadd operarios
+  groupadd ingenieria
+  groupadd supervisores
 
+  useradd -e 2022-12-12 -s /bin/bash -m -G operarios alberto
+  useradd -e 2022-12-12 -s /bin/bash -m -G operarios oscar
+  useradd -e 2022-12-12 -s /bin/bash -m -G operarios hugo
+  useradd -e 2022-12-12 -s /bin/bash -m -G ingenieria nestor
+  useradd -e 2022-12-12 -s /bin/bash -m -G ingenieria victor
+  useradd -e 2022-12-12 -s /bin/bash -m -G ingenieria lucia
+  useradd -e 2022-12-12 -s /bin/bash -m -G supervisores carlos
+  useradd -e 2022-12-12 -s /bin/bash -m -G supervisores mary
+  useradd -e 2022-12-12 -s /bin/bash -m -G supervisores john
 
+  mkdir /ACL
+  mkdir /ACL/planos
+  cp ~/repos/centos-server/script /ACL/planos/autoclave
+  cp ~/repos/centos-server/script /ACL/planos/caldera
+  cp ~/repos/centos-server/script /ACL/planos/destilacion
+
+  # Supervisores - r_x -> planos
+  # Ingenieria victor - rwx -> planos 
+  # Ingenieria lucia - rw_ -> planos/autoclave
+  # Ingenieria lucia - rwx -> hmi_planta
+  # Ingenieria nestor - r_x -> hmi_planta
+  # Operarios - __x -> hmi_planta
+  # Operarios alberto - r__ -> planos/autoclave
+  # Operarios oscar - r__ -> planos/caldera
+
+}
